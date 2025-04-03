@@ -32,7 +32,7 @@ Feature: Test Suite for error adding passenger to flight
     And agent is requested to retry
 
   Scenario: Booking fails when exceeding available economy seats
-    Given passenger selects flight "UQAM032"
+    Given passenger selects flight "UQAM005"
     And flight catalog is mocked
     And plane catalog is mocked where number of first class seats is 3, number of business class seats is 5 and number of economy seats is 2
     And service is initialized
@@ -54,12 +54,12 @@ Feature: Test Suite for error adding passenger to flight
       | economy |
     When agent pass all information to the system and continue "yes"
     And system is called
-    Then passenger "OverPassenger_1" is added to fly "UQAM032"
-    Then passenger "OverPassenger_2" is added to fly "UQAM032"
-    Then passenger "OverPassenger_3" is not added to fly "UQAM032"
+    Then passenger "OverPassenger_1" is added to fly "UQAM005"
+    Then passenger "OverPassenger_2" is added to fly "UQAM005"
+    Then passenger "OverPassenger_3" is not added to fly "UQAM005"
 
   Scenario: Booking fails if no seats are available in any class
-    Given passenger selects flight "UQAM999"
+    Given passenger selects flight "UQAM005"
     And flight catalog is mocked
     And plane catalog is mocked where number of first class seats is 0, number of business class seats is 0 and number of economy seats is 0
     And service is initialized
@@ -72,7 +72,7 @@ Feature: Test Suite for error adding passenger to flight
     Then an error message "No seats available" is displayed
 
   Scenario: Booking fails if age exceeds -1
-    Given passenger selects flight "UQAM777"
+    Given passenger selects flight "UQAM005"
     And flight catalog is mocked
     And plane catalog is mocked where number of first class seats is 5, number of business class seats is 10 and number of economy seats is 30
     And service is initialized
