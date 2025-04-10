@@ -127,6 +127,8 @@ Feature: Test Suite for successfully adding passenger to flight
     Then passenger "Youssouf Abdou" is added to fly "UQAM124"
     And confirmation message is displayed
 
+
+
   Scenario: Register a passenger in an existing flight
     Given flight "UQAM005" exists in the flight catalog
     And plane catalog is mocked where number of first class seats is 5, number of business class seats is 10 and number of economy seats is 30
@@ -140,38 +142,44 @@ Feature: Test Suite for successfully adding passenger to flight
     Then passenger "Pap Diop" is added to fly "UQAM005"
     And confirmation message is displayed
 
+    # Nouveaux ajouts au scénarios
 
- # Scenario: Automatic downgrade when First Class is full
- #   Given passenger selects flight "UQAM007"
- #   And flight catalog is mocked
- #   And plane catalog is mocked with:
- #     | First Class | 0  |
- #     | Business    | 5  |
- #     | Economy     | 10 |
- #   And service is initialized
- #   And a passenger with:
- #     | Passport Number | PASSPORT_CAD008 |
- #     | Name            | Passenger_8 |
- #     | Age             | 28 |
- #     | Class           | first |
- #   When agent submits all information to the system and continues "no"
- #   And system is processed
- #   Then passenger "Passenger_8" is added to flight "UQAM007" in "business" class
+  Scenario: Passenger data is saved in passengerData.csv
+    Given passenger selects flight "UQAM099"
+    And flight catalog is mocked
+    And plane catalog is mocked where number of first class seats is 2, number of business class seats is 2 and number of economy seats is 2
+    And service is initialized
+    And a passenger with passport number "PASSPORT_789XYZ"
+    And name "Abdou Youssouf"
+    And age 25
+    And looking to buy in "economy" class
+    When agent pass all information to the system and continue "no"
+    And system is called
+    Then passenger is added to fly "UQAM099"
 
- # Scenario: Correct points calculation based on passenger type
- #   Given passenger selects flight "UQAM009"
- #   And flight catalog is mocked
- #   And plane catalog is mocked with:
- #     | First Class | 5  |
- #     | Business    | 5  |
- #     | Economy     | 5  |
- #   And service is initialized
- #   And a passenger with:
- #     | Passport Number | PASSPORT_CAD010 |
- #     | Name           | Passenger_10 |
- #     | Age            | 50 |
- #     | Class          | first |
- #   And the flight distance is 1000 km
- #   When agent submits all information to the system and continues "no"
- #   And system is processed
- #   Then passenger "Passenger_10" earns 2000 points
+
+  Scenario: Add passenger at maximum valid age
+    Given passenger selects flight "UQAM005"
+    And flight catalog is mocked
+    And plane catalog is mocked where number of first class seats is 1, number of business class seats is 1 and number of economy seats is 1
+    And service is initialized
+    And a passenger with passport number "PASSPORT_789XYZ4"
+    And name "Vieux"
+    And age 120
+    And looking to buy in "business" class
+    When agent pass all information to the system and continue "no"
+    And system is called
+    Then passenger is added to fly "UQAM005"
+
+  Scenario: Add passenger First Class when name is empty
+    Given passenger selects flight "UQAM005"
+    And flight catalog is mocked
+    And plane catalog is mocked where number of first class seats is 2, number of business class seats is 5 and number of economy seats is 6
+    And service is initialized
+    And a passenger with passport number "PASSPORT_789XYZ"
+    And name ""
+    And age 25
+    And looking to buy in "economy" class
+    When agent pass all information to the system and continue "no"
+    And system is called
+    Then passenger is not added to fly "UQAM005"

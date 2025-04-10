@@ -21,6 +21,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Scanner;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,8 +72,7 @@ public class ExecuteServiceTest {
         Map passengerData = mock(Map.class);
         given(passengerPromptService.getPassengerData(scanner)).willReturn(passengerData);
         given(passengerService.createPassenger(flightInformation, passengerData)).willReturn(passenger);
-        given(flightCatalog.getFlightInformation(FLIGHT_NUMBER)).willReturn(flightInformation);
-        given(bookingService.isBooked(passenger, flightInformation)).willReturn(true);
+        given(bookingService.isBooked(passenger, flightInformation)).willReturn(Optional.of(passenger));
 
         initializeMock = mockStatic(ApplicationInitializer.class);
         initializeMock.when(ApplicationInitializer::fileWriterProvider).thenReturn(fileWriterProvider);
@@ -126,8 +126,8 @@ public class ExecuteServiceTest {
     @Test
     void doesNotSavePassengerWhenIsBookedFalse() throws IOException {
         // Given
-        given(bookingService.isBooked(passenger, flightInformation)).willReturn(false);
-        given(scanner.nextLine()).willReturn("yes");
+        given(bookingService.isBooked(passenger, flightInformation)).willReturn(Optional.empty());
+        given(scanner.nextLine()).willReturn("yes").willReturn("no");
         doNothing().when(scanner).close();
         doNothing().when(fileWriter).close();
 

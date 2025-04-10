@@ -40,7 +40,7 @@ public class PassengerPromptService {
             case "economy" -> {
                 return PassengerClass.ECONOMY_CLASS;
             }
-            default -> throw new PassengerTypeNotFoundException();
+            default -> throw new PassengerTypeNotFoundException("");
         }
     }
 }

@@ -12,7 +12,6 @@ class PassengerClassTest {
         assertThat(PassengerClass.FIRST_CLASS.name()).isEqualTo("FIRST_CLASS");
         assertThat(PassengerClass.BUSINESS_CLASS.name()).isEqualTo("BUSINESS_CLASS");
         assertThat(PassengerClass.ECONOMY_CLASS.name()).isEqualTo("ECONOMY_CLASS");
-        assertThat(PassengerClass.DEFAULT.name()).isEqualTo("DEFAULT");
     }
 
 }

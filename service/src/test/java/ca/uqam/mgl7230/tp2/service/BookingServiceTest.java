@@ -1,9 +1,8 @@
 package ca.uqam.mgl7230.tp2.service;
 
 import ca.uqam.mgl7230.tp2.model.flight.FlightInformation;
-import ca.uqam.mgl7230.tp2.model.passenger.Passenger;
-import ca.uqam.mgl7230.tp2.model.passenger.PassengerClass;
-import ca.uqam.mgl7230.tp2.model.passenger.PassengerKeyConstants;
+import ca.uqam.mgl7230.tp2.model.passenger.*;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,11 +11,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class BookingServiceTest {
@@ -27,156 +26,152 @@ public class BookingServiceTest {
 
     @InjectMocks
     private BookingService bookingService;
+
     @Mock
     private FlightPassengerService flightPassengerService;
+
     @Mock
     private Passenger firstClassPassenger;
+
     @Mock
     private Passenger businessClassPassenger;
+
     @Mock
     private Passenger economyClassPassenger;
+
     @Mock
     private PassengerService passengerService;
+
     @Mock
     private FlightInformation flightInformation;
 
     @Test
     void successfullyAddFirstClassPassengerDirectly() {
-        // Given
         given(firstClassPassenger.getType()).willReturn(PassengerClass.FIRST_CLASS);
+        given(firstClassPassenger.getPassport()).willReturn(PASSENGER_PASSPORT);
+        given(firstClassPassenger.getName()).willReturn(PASSENGER_NAME);
+        given(firstClassPassenger.getAge()).willReturn(PASSENGER_AGE);
         given(flightPassengerService.numberOfTotalSeatsAvailable()).willReturn(1);
         given(flightPassengerService.numberOfFirstClassSeatsAvailable()).willReturn(1);
 
-        // When
-        boolean isBooked = bookingService.isBooked(firstClassPassenger, flightInformation);
+        Optional<Passenger> result = bookingService.isBooked(firstClassPassenger, flightInformation);
 
-        // Then
-        assertThat(isBooked).isTrue();
-        verify(flightPassengerService, never()).numberOfBusinessClassSeatsAvailable();
-        verify(flightPassengerService, never()).numberOfEconomyClassSeatsAvailable();
+        assertThat(result).isPresent().contains(firstClassPassenger);
         verify(flightPassengerService).addPassenger(firstClassPassenger);
     }
 
     @Test
     void successfullyAddBusinessClassPassengerDirectly() {
-        // Given
         given(businessClassPassenger.getType()).willReturn(PassengerClass.BUSINESS_CLASS);
+        given(businessClassPassenger.getPassport()).willReturn(PASSENGER_PASSPORT);
+        given(businessClassPassenger.getName()).willReturn(PASSENGER_NAME);
+        given(businessClassPassenger.getAge()).willReturn(PASSENGER_AGE);
         given(flightPassengerService.numberOfTotalSeatsAvailable()).willReturn(1);
         given(flightPassengerService.numberOfBusinessClassSeatsAvailable()).willReturn(1);
 
-        // When
-        boolean isBooked = bookingService.isBooked(businessClassPassenger, flightInformation);
+        Optional<Passenger> result = bookingService.isBooked(businessClassPassenger, flightInformation);
 
-        // Then
-        assertThat(isBooked).isTrue();
-        verify(flightPassengerService, never()).numberOfFirstClassSeatsAvailable();
-        verify(flightPassengerService, never()).numberOfEconomyClassSeatsAvailable();
+        assertThat(result).isPresent().contains(businessClassPassenger);
         verify(flightPassengerService).addPassenger(businessClassPassenger);
     }
 
     @Test
     void successfullyAddEconomyClassPassengerDirectly() {
-        // Given
         given(economyClassPassenger.getType()).willReturn(PassengerClass.ECONOMY_CLASS);
+        given(economyClassPassenger.getPassport()).willReturn(PASSENGER_PASSPORT);
+        given(economyClassPassenger.getName()).willReturn(PASSENGER_NAME);
+        given(economyClassPassenger.getAge()).willReturn(PASSENGER_AGE);
         given(flightPassengerService.numberOfTotalSeatsAvailable()).willReturn(1);
         given(flightPassengerService.numberOfEconomyClassSeatsAvailable()).willReturn(1);
 
-        // When
-        boolean isBooked = bookingService.isBooked(economyClassPassenger, flightInformation);
+        Optional<Passenger> result = bookingService.isBooked(economyClassPassenger, flightInformation);
 
-        // Then
-        assertThat(isBooked).isTrue();
-        verify(flightPassengerService, never()).numberOfFirstClassSeatsAvailable();
-        verify(flightPassengerService, never()).numberOfBusinessClassSeatsAvailable();
+        assertThat(result).isPresent().contains(economyClassPassenger);
         verify(flightPassengerService).addPassenger(economyClassPassenger);
     }
 
     @Test
     void tryFirstClassAndAddBusinessClassPassenger() {
-        // Given
         given(firstClassPassenger.getPassport()).willReturn(PASSENGER_PASSPORT);
         given(firstClassPassenger.getName()).willReturn(PASSENGER_NAME);
+        given(firstClassPassenger.getAge()).willReturn(PASSENGER_AGE);
         given(firstClassPassenger.getType()).willReturn(PassengerClass.FIRST_CLASS);
         given(flightPassengerService.numberOfTotalSeatsAvailable()).willReturn(1);
         given(flightPassengerService.numberOfFirstClassSeatsAvailable()).willReturn(0);
-        given(passengerService.createPassenger(flightInformation,
-                getPassengerKeyConstantsObjectMap(PassengerClass.BUSINESS_CLASS))).willReturn(businessClassPassenger);
-        given(businessClassPassenger.getType()).willReturn(PassengerClass.BUSINESS_CLASS);
         given(flightPassengerService.numberOfBusinessClassSeatsAvailable()).willReturn(1);
+        given(passengerService.createPassenger(flightInformation,
+                getPassengerKeyConstantsObjectMap(PassengerClass.BUSINESS_CLASS)))
+                .willReturn(businessClassPassenger);
+        given(businessClassPassenger.getType()).willReturn(PassengerClass.BUSINESS_CLASS);
 
-        // When
-        boolean isBooked = bookingService.isBooked(firstClassPassenger, flightInformation);
+        Optional<Passenger> result = bookingService.isBooked(firstClassPassenger, flightInformation);
 
-        // Then
-        assertThat(isBooked).isTrue();
-        verify(flightPassengerService, never()).numberOfEconomyClassSeatsAvailable();
+        assertThat(result).isPresent().contains(businessClassPassenger);
         verify(flightPassengerService).addPassenger(businessClassPassenger);
     }
 
     @Test
     void tryFirstClassAndThenBusinessClassAndFinallyAddEconomyPassenger() {
-        // Given
         given(firstClassPassenger.getPassport()).willReturn(PASSENGER_PASSPORT);
         given(firstClassPassenger.getName()).willReturn(PASSENGER_NAME);
+        given(firstClassPassenger.getAge()).willReturn(PASSENGER_AGE);
         given(firstClassPassenger.getType()).willReturn(PassengerClass.FIRST_CLASS);
         given(flightPassengerService.numberOfTotalSeatsAvailable()).willReturn(1);
         given(flightPassengerService.numberOfFirstClassSeatsAvailable()).willReturn(0);
-        given(passengerService.createPassenger(flightInformation,
-                getPassengerKeyConstantsObjectMap(PassengerClass.BUSINESS_CLASS))).willReturn(businessClassPassenger);
-        given(businessClassPassenger.getType()).willReturn(PassengerClass.BUSINESS_CLASS);
         given(flightPassengerService.numberOfBusinessClassSeatsAvailable()).willReturn(0);
-        given(passengerService.createPassenger(flightInformation,
-                getPassengerKeyConstantsObjectMap(PassengerClass.ECONOMY_CLASS))).willReturn(economyClassPassenger);
         given(flightPassengerService.numberOfEconomyClassSeatsAvailable()).willReturn(1);
+
+        given(passengerService.createPassenger(flightInformation,
+                getPassengerKeyConstantsObjectMap(PassengerClass.BUSINESS_CLASS)))
+                .willReturn(businessClassPassenger);
+        given(businessClassPassenger.getType()).willReturn(PassengerClass.BUSINESS_CLASS);
+
+        given(passengerService.createPassenger(flightInformation,
+                getPassengerKeyConstantsObjectMap(PassengerClass.ECONOMY_CLASS)))
+                .willReturn(economyClassPassenger);
         given(economyClassPassenger.getType()).willReturn(PassengerClass.ECONOMY_CLASS);
 
-        // When
-        boolean isBooked = bookingService.isBooked(firstClassPassenger, flightInformation);
+        Optional<Passenger> result = bookingService.isBooked(firstClassPassenger, flightInformation);
 
-        // Then
-        assertThat(isBooked).isTrue();
+        assertThat(result).isPresent().contains(economyClassPassenger);
         verify(flightPassengerService).addPassenger(economyClassPassenger);
     }
 
     @Test
-    void tryFirstClassAndThenBusinessClassAndThenEconomyClassButFlightIsFull() {
-        // Given
+    void tryAllClassesButFlightIsFull() {
         given(firstClassPassenger.getPassport()).willReturn(PASSENGER_PASSPORT);
         given(firstClassPassenger.getName()).willReturn(PASSENGER_NAME);
+        given(firstClassPassenger.getAge()).willReturn(PASSENGER_AGE);
         given(firstClassPassenger.getType()).willReturn(PassengerClass.FIRST_CLASS);
         given(flightPassengerService.numberOfTotalSeatsAvailable()).willReturn(1);
         given(flightPassengerService.numberOfFirstClassSeatsAvailable()).willReturn(0);
-        given(passengerService.createPassenger(flightInformation,
-                getPassengerKeyConstantsObjectMap(PassengerClass.BUSINESS_CLASS))).willReturn(businessClassPassenger);
-        given(businessClassPassenger.getType()).willReturn(PassengerClass.BUSINESS_CLASS);
         given(flightPassengerService.numberOfBusinessClassSeatsAvailable()).willReturn(0);
-        given(passengerService.createPassenger(flightInformation,
-                getPassengerKeyConstantsObjectMap(PassengerClass.ECONOMY_CLASS))).willReturn(economyClassPassenger);
         given(flightPassengerService.numberOfEconomyClassSeatsAvailable()).willReturn(0);
+
+        given(passengerService.createPassenger(flightInformation,
+                getPassengerKeyConstantsObjectMap(PassengerClass.BUSINESS_CLASS)))
+                .willReturn(businessClassPassenger);
+        given(businessClassPassenger.getType()).willReturn(PassengerClass.BUSINESS_CLASS);
+
+        given(passengerService.createPassenger(flightInformation,
+                getPassengerKeyConstantsObjectMap(PassengerClass.ECONOMY_CLASS)))
+                .willReturn(economyClassPassenger);
         given(economyClassPassenger.getType()).willReturn(PassengerClass.ECONOMY_CLASS);
 
-        // When
-        boolean isBooked = bookingService.isBooked(firstClassPassenger, flightInformation);
+        Optional<Passenger> result = bookingService.isBooked(firstClassPassenger, flightInformation);
 
-        // Then
-        assertThat(isBooked).isFalse();
-        verify(flightPassengerService, never()).addPassenger(economyClassPassenger);
+        assertThat(result).isEmpty();
+        verify(flightPassengerService, never()).addPassenger(any());
     }
 
     @Test
-    void addPassengerNeverCalled() {
-        // Given
+    void flightIsCompletelyFull() {
         given(flightPassengerService.numberOfTotalSeatsAvailable()).willReturn(0);
 
-        // When
-        boolean isBooked = bookingService.isBooked(firstClassPassenger, flightInformation);
+        Optional<Passenger> result = bookingService.isBooked(firstClassPassenger, flightInformation);
 
-        // Then
-        assertThat(isBooked).isFalse();
-        verify(flightPassengerService, never()).numberOfFirstClassSeatsAvailable();
-        verify(flightPassengerService, never()).numberOfBusinessClassSeatsAvailable();
-        verify(flightPassengerService, never()).numberOfEconomyClassSeatsAvailable();
-        verify(flightPassengerService, never()).addPassenger(firstClassPassenger);
+        assertThat(result).isEmpty();
+        verify(flightPassengerService, never()).addPassenger(any());
     }
 
     private Map<PassengerKeyConstants, Object> getPassengerKeyConstantsObjectMap(final PassengerClass passengerClass) {

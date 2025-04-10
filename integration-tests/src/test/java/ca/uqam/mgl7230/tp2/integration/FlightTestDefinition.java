@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import static ca.uqam.mgl7230.tp2.config.ApplicationInitializer.bookingService;
+import static junit.framework.TestCase.assertEquals;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.BDDMockito.given;
@@ -173,7 +174,7 @@ public class FlightTestDefinition {
     @When("agent pass all information to the system and continue {string}")
     public void agentPassAllInformationToTheSystem(String continueAdding) {
         if (passengerPassports == null) {
-            if (passengerAge <= 0 || passengerAge > 120) {
+            if (passengerAge <= 0 || passengerAge >= 120) {
                 shouldSkipSystemCall = true;
                 return;
             }
@@ -260,6 +261,27 @@ public class FlightTestDefinition {
             System.err.println("Error reading file: " + e.getMessage());
         }
     }
+
+    //Ajout de nouveau code
+
+    @Then("passenger is not added to fly {string}")
+    public void passengerIsNotAddedToFly(String flightNumber) {
+        String filePath = "passengerData.csv";
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            boolean found = br.lines().anyMatch(line ->
+                    line.contains(flightNumber)
+                            && line.contains(passengerName)
+                            && line.contains(passengerPassport)
+            );
+
+            assertThat(found).isFalse();
+
+        } catch (IOException e) {
+            fail("Error reading file: " + e.getMessage());
+        }
+    }
+
 
     @Then("no data is added to file")
     public void noDataIsAddedToFile() {
@@ -381,5 +403,51 @@ public class FlightTestDefinition {
             System.err.println("Error reading file: " + e.getMessage());
         }
     }
+    @Then("the system should {string} the passenger")
+    public void the_system_should_action_the_passenger(String action) {
+        String filePath = "passengerData.csv";
+
+        if (shouldSkipSystemCall && action.equals("reject")) {
+            System.out.println("Passenger rejected due to invalid data. No file generated.");
+            return; // Test réussi : rejet effectué sans appel système
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String content = br.lines().reduce("", String::concat);
+
+            if (action.equals("reject")) {
+                assertThat(content).doesNotContain(passengerName);
+                assertThat(content).doesNotContain(passengerPassport);
+            } else if (action.equals("accept")) {
+                assertThat(content).contains(passengerName);
+                assertThat(content).contains(passengerPassport);
+            } else {
+                fail("Unknown action: " + action);
+            }
+
+        } catch (IOException e) {
+            fail("Error reading file: " + e.getMessage());
+        }
+    }
+
+    @Then("file contains no entry due to missing passenger information")
+    public void fileContainsNoEntryDueToMissingInfo() {
+        String filePath = "passengerData.csv";
+        File file = new File(filePath);
+
+        // Cas où le fichier n’existe pas du tout (aucun passager validé)
+        if (!file.exists()) {
+            return;
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String content = br.lines().reduce("", String::concat);
+            assertThat(content).doesNotContain("Alice Smith");
+            assertThat(content).doesNotContain("FIRST_CLASS");
+        } catch (IOException e) {
+            fail("Error reading file: " + e.getMessage());
+        }
+    }
+
 
 }

@@ -1,31 +1,51 @@
 package ca.uqam.mgl7230.tp2.utils;
 
 import ca.uqam.mgl7230.tp2.model.flight.FlightInformation;
+import ca.uqam.mgl7230.tp2.model.passenger.Passenger;
 
 public class DistanceCalculator {
 
-    public static int calculateDistance(int baseDistance, String passengerClass) {
-        switch (passengerClass) {
-            case "FIRST_CLASS":
-                return baseDistance * 2;  // Multiplicateur de 2 pour la première classe
-            case "BUSINESS_CLASS":
-                return baseDistance * 3 / 2;  // Multiplicateur de 1.5 pour la classe affaires
-            case "ECONOMY_CLASS":
-                return baseDistance;  // Pas de changement pour la classe économique
+    private static final int EARTH_RADIUS_KM = 6371;
+
+    public int calculate(FlightInformation info) {
+        double lat1Rad = toRadians(info.getLatSource());
+        double lon1Rad = toRadians(info.getLonSource());
+        double lat2Rad = toRadians(info.getLatDestination());
+        double lon2Rad = toRadians(info.getLonDestination());
+
+        return (int) computeGreatCircleDistance(lat1Rad, lon1Rad, lat2Rad, lon2Rad);
+    }
+
+    public int calculateWithMultiplier(FlightInformation info, Passenger passenger) {
+        int baseDistance = calculate(info);
+        double multiplier = resolveMultiplier(passenger);
+        return applyMultiplier(baseDistance, multiplier);
+    }
+
+    private double computeGreatCircleDistance(double lat1, double lon1, double lat2, double lon2) {
+        double angle = Math.acos(Math.sin(lat1) * Math.sin(lat2) +
+                Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1));
+        return angle * EARTH_RADIUS_KM;
+    }
+
+    private double resolveMultiplier(Passenger passenger) {
+        switch (passenger.getType()) {
+            case FIRST_CLASS:
+                return 2.0;
+            case BUSINESS_CLASS:
+                return 1.5;
+            case ECONOMY_CLASS:
+                return 1.0;
             default:
-                throw new IllegalArgumentException("Classe inconnue: " + passengerClass);
+                throw new IllegalArgumentException("Type de passager inconnu");
         }
     }
 
+    private int applyMultiplier(int distance, double multiplier) {
+        return (int) (distance * multiplier);
+    }
 
-    public int calculate(FlightInformation flightInformation) {
-        double lat1 = Math.toRadians(flightInformation.getLatSource());
-        double lon1 = Math.toRadians(flightInformation.getLonSource());
-        double lat2 = Math.toRadians(flightInformation.getLatDestination());
-        double lon2 = Math.toRadians(flightInformation.getLonDestination());
-
-        return (int) (Math.acos(Math.sin(lat1) * Math.sin(lat2) +
-                        Math.cos(lat1) * Math.cos(lat2) *
-                                Math.cos(lon2 - lon1)) * 6371);
+    private double toRadians(double degree) {
+        return Math.toRadians(degree);
     }
 }

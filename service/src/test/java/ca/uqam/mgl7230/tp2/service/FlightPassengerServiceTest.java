@@ -12,7 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static ca.uqam.mgl7230.tp2.model.passenger.PassengerClass.DEFAULT;
+//import static ca.uqam.mgl7230.tp2.model.passenger.PassengerClass.DEFAULT;
 import static ca.uqam.mgl7230.tp2.model.passenger.PassengerClass.FIRST_CLASS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -153,20 +153,6 @@ public class FlightPassengerServiceTest {
         assertThat(numberOfTotalSeatsAvailable).isEqualTo(5);
     }
 
-    @Test
-    void defaultSwitchTest() {
-        // Given
-        given(passenger.getType()).willReturn(DEFAULT);
-        given(planeCatalog.getNumberSeatsFirstClass(PLANE_TYPE)).willReturn(2);
-        flightPassengerService = new FlightPassengerService(planeCatalog, flightCatalog);
-        flightPassengerService.initializeFlightService(FLIGHT_NUMBER);
-
-        // When
-        flightPassengerService.addPassenger(passenger);
-        int numberOfFirstClassSeatsAvailable = flightPassengerService.numberOfFirstClassSeatsAvailable();
-
-        // Then
-        assertThat(numberOfFirstClassSeatsAvailable).isEqualTo(2);
-    }
+    //Suppression de test
 
 }

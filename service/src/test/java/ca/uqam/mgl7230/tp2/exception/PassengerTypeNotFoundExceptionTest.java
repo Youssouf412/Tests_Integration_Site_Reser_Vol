@@ -9,7 +9,7 @@ class PassengerTypeNotFoundExceptionTest {
     @Test
     void testException() {
         // When
-        PassengerTypeNotFoundException passengerTypeNotFoundException = new PassengerTypeNotFoundException();
+        PassengerTypeNotFoundException passengerTypeNotFoundException = new PassengerTypeNotFoundException("");
 
         // Then
         assertThat(passengerTypeNotFoundException).isInstanceOf(PassengerTypeNotFoundException.class);

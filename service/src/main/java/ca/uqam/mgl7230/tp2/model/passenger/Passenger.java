@@ -15,6 +15,7 @@ public abstract class Passenger {
         this.name = name;
         this.age = age;
         this.millagePoints = millagePoints;
+//        PassengerValidator.validate(passport, name, age);
     }
 
     public abstract PassengerClass getType();

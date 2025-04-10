@@ -28,8 +28,10 @@ Feature: Test Suite for error adding passenger to flight
     And looking to buy in "first" class
     When agent pass all information to the system and continue "no"
     And system is called
-    Then file contains an entry with missing passenger information
+    Then file contains no entry due to missing passenger information
     And agent is requested to retry
+
+    # scénario a ne pas considérer
 
   Scenario: Booking fails when exceeding available economy seats
     Given passenger selects flight "UQAM005"
@@ -76,10 +78,25 @@ Feature: Test Suite for error adding passenger to flight
     And flight catalog is mocked
     And plane catalog is mocked where number of first class seats is 5, number of business class seats is 10 and number of economy seats is 30
     And service is initialized
-    And a passenger with passport number "PASSPORT_AGE999"
-    And name "Old Grandpa"
+    And a passenger with passport number "PASSPORT_789XYZ"
+    And name "Vieux"
     And age -1
     And looking to buy in "economy" class
     When agent pass all information to the system and continue "no"
     And system is called
     Then system prevents booking due to invalid age
+
+# Ajout de scéarios
+
+  Scenario: Reject passenger with invalid age
+    Given passenger selects flight "UQAM007"
+    And flight catalog is mocked
+    And plane catalog is mocked where number of first class seats is 1, number of business class seats is 2 and number of economy seats is 2
+    And service is initialized
+    And a passenger with passport number "PASSPORT_789XYZ"
+    And name "Vieux"
+    And age 125
+    And looking to buy in "economy" class
+    When agent pass all information to the system and continue "no"
+    And system is called
+    Then the system should "reject" the passenger
