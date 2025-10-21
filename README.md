@@ -30,5 +30,5 @@ En cas de doute, vous pouvez aussi exécuter le code et suivre les étapes deman
 4)	Après avoir rédigé les tests d'erreur, corrigez le code pour faire passé le test et faites le en mode TDD
 
 ##Auteurs:
-Flavio Castells
-Youssoufi Garba Abdourrahmane
+-Flavio Castells
+-Youssoufi Garba Abdourrahmane
