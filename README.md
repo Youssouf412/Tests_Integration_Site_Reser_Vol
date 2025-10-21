@@ -28,3 +28,7 @@ En cas de doute, vous pouvez aussi exécuter le code et suivre les étapes deman
 2)	Implementer les tests d'intégration déjà sélectioné
 3)	Ajouter par vous mêmes, des scenarios de tests d'intégration pour faire des validations du code existant
 4)	Après avoir rédigé les tests d'erreur, corrigez le code pour faire passé le test et faites le en mode TDD
+
+##Auteurs:
+Flavio Castells
+Youssoufi Garba Abdourrahmane
